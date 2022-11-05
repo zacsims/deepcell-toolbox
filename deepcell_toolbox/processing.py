@@ -30,14 +30,15 @@ from __future__ import print_function
 
 import logging
 
-import numpy as np
+#import numpy as np
+import cupy as np
 from scipy import ndimage
-from skimage import morphology
-from skimage import segmentation
-from skimage.feature import peak_local_max
-from skimage.exposure import equalize_adapthist
-from skimage.exposure import rescale_intensity
-from skimage.measure import label
+from cucim.skimage import morphology
+from cucim.skimage import segmentation
+from cucim.skimage.feature import peak_local_max
+from cucim.skimage.exposure import equalize_adapthist
+from cucim.skimage.exposure import rescale_intensity
+from cucim.skimage.measure import label
 
 
 def normalize(image, epsilon=1e-07):
@@ -231,7 +232,8 @@ def watershed(image, min_distance=10, min_size=50, threshold_abs=0.05):
 
     # markers = label(local_maxi)
     markers = ndimage.label(local_maxi)[0]
-    segments = segmentation.watershed(-distance, markers, mask=labels)
+    from skimage.segmentation import watershed as ws
+    segments = ws(-distance, markers, mask=labels)
     results = np.expand_dims(segments, axis=-1)
     results = morphology.remove_small_objects(
         results, min_size=min_size, connectivity=1)
